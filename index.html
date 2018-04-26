@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scalar Auto-navigate Plugin</title>
+<meta name="author" content="http://craigdietrich.com">
+<meta name="description" content="Auto-navigate Scalar projects. Also works with Omeka. See documentation at https://github.com/craigdietrich/scalar-auto-navigate.">
+<style>
+body {color:#e3e3e3; font-size:1rem; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !important;}
+#site {position:absolute; left:0px; top:0px; width:100%; height:100%; z-index:8; border:0; background-color:#ffffff;}
+#countdown {position:absolute; background-color:#333333; right:70px; top:0px; padding:5px 10px 3px 10px; font-size:smaller; z-index:9;}
+</style>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script>
+var platform = null;;
+$(document).ready(function() {
+	var $iframe = $('#site');
+	// Determine the platform
+	if (-1 != document.location.href.indexOf('?book=') && -1 != document.location.href.indexOf('system/application/plugins')) {
+		platform = 'scalar';
+	} else if (-1 != document.location.href.indexOf('plugins/AutoNavigate')) {
+		platform = 'omeka';
+	} else {
+		alert('Could not determine the platform (Scalar, Omeka)');
+		return;
+	}
+	console.log('Platform: '+platform);
+	// Get the current book or site, load it, and start the timer
+	if ('scalar' == platform) {
+		var system = document.location.href.substr(0, document.location.href.indexOf('system/application/plugins'));
+		var slug = document.location.href.substr(document.location.href.indexOf('?book=')+6);
+		var url = system + slug;
+	} else if ('omeka' == platform) {
+		var url = document.location.href.substr(0, document.location.href.indexOf('plugins/AutoNavigate'));
+	};
+	$iframe.on('load', function() {
+		reset_timer();
+		$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove scroll", function () {
+			reset_timer();
+		});
+	});
+	$iframe.attr('src', url);
+});
+function reset_timer(start) {
+	if ('undefined'==typeof(start)) start = 10;
+	$('#countdown').text(start + ' sec');
+	if ('undefined'!=typeof(interval) && null!=interval) {
+		clearInterval(interval);
+		interval = null;		
+	}
+	interval = setInterval(function() {
+		start--;
+		$('#countdown').text(start + ' sec');
+		if (!start) {
+			clearInterval(interval);
+			interval = null;
+			if (!do_scroll()) do_click();
+			return;
+		};
+	}, 1000);
+};
+function do_scroll() {
+	$iframe = $("#site");
+	var buffer = 300;
+	var amount = 600;
+	var duration = 2500;
+	if ( $iframe.contents().scrollTop() + $iframe.height() >= $iframe.contents().height() - buffer ) {
+		return false;
+	};
+	var scroll_to = parseInt($iframe.contents().scrollTop()) + amount;
+	if (scroll_to + parseInt($iframe.height()) > parseInt($iframe.contents().height())) scroll_to = parseInt($iframe.contents().height()) - parseInt($iframe.height());
+	$iframe.contents().children().animate({ 
+		scrollTop: scroll_to + "px" 
+	}, duration, function() {
+		reset_timer();
+	});
+	return true;
+};
+function do_click() {
+	var url = get_url();
+	console.log('clicking: '+url);
+	if (!url) {
+		// TODO
+		return;
+	}
+	$('#site').attr('src', url);
+};
+function get_url() {
+	if ('scalar' == platform) {
+		return scalar_get_url();
+	} else if ('omeka' == platform) {
+		return omeka_get_url();
+	};
+	return null;
+};
+function scalar_get_url() {
+	var selectors = [
+		'article header a.path_begin:first',  // "Begin path" on splash pages
+		'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
+		'article .relationships a.nav_btn:first',  // Move to a different path
+		// TODO: continue to button
+		'article .relationships a.path_begin:first'  // "Begin path" on pages
+	];
+	var $iframe = $('#site');
+	var selector = '';
+	for (var j = 0; j < selectors.length; j++) {
+		var $el = $iframe.contents().find(selectors[j]);
+		if ($el.length && 'undefined'!=typeof($el.attr('href'))) return $el.attr('href');
+	};
+	return null;
+};
+function omeka_get_url() {
+	var selectors = [
+		'#featured-collection .collection:first a:first',  // Featured collection
+		'#collection-items .item:first a:first',  // Item in collection
+		'.item-pagination #next-item a:first',  // Next item in collection
+		'.collection h2:first a:first',  // Collection in Browse collections tab
+		'.nav-menu .nav-item:nth-child(2) a:first'  // Browse collections
+	];
+	var $iframe = $('#site');
+	var selector = '';
+	for (var j = 0; j < selectors.length; j++) {
+		var $el = $iframe.contents().find(selectors[j]);
+		if ($el.length && 'undefined'!=typeof($el.attr('href'))) return $el.attr('href');
+	};
+	return null;
+};
+</script>
+</head>
+<body>
+<div id="countdown"></div>
+<iframe id="site" src=""></iframe>
+</body>
+</html>
