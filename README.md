@@ -1,4 +1,4 @@
-# scalar-auto-navigate
+# Scalar & Omeka Auto-navigate
 Have the browser auto-navigate through Scalar books. Also works with Omeka.
 
 ## Scalar  
