@@ -20,6 +20,7 @@ $(document).ready(function() {
 		platform = 'scalar';
 	} else if (-1 != document.location.href.indexOf('plugins/AutoNavigate')) {
 		platform = 'omeka';
+	// TODO: Omeka S
 	} else {
 		alert('Could not determine the platform (Scalar, Omeka)');
 		return;
@@ -79,7 +80,6 @@ function do_scroll() {
 		var el = $iframe.contents().find('article').eq(0);  // The area we want to scroll
 		var scroller = el.closest(":scrollable(vertical)");  // The area that can actually scroll (probably the body tag)	
 		if (scroller.length <= 0) return false;
-		console.log('trying to scroll');
 		scroller = scroller.eq(0);
 		scroller.animate({
 			scrollTop: scroll_to
