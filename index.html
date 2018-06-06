@@ -48,7 +48,7 @@ $(document).ready(function() {
 	$iframe.attr('src', url);
 });
 function reset_timer(start) {
-	if ('undefined'==typeof(start)) start = 10;
+	if ('undefined'==typeof(start)) start = 12;
 	$('#countdown').text(start + ' sec');
 	if ('undefined'!=typeof(interval) && null!=interval) {
 		clearInterval(interval);
@@ -67,8 +67,8 @@ function reset_timer(start) {
 };
 function do_scroll() {
 	$iframe = $("#site");
-	var buffer = 300;
-	var amount = 600;
+	var buffer = parseInt($iframe.height()) * 0.5;
+	var amount = parseInt($iframe.height()) * 0.9;
 	var duration = 2500;
 	if ( $iframe.contents().scrollTop() + $iframe.height() >= $iframe.contents().height() - buffer ) {
 		return false;
@@ -76,14 +76,15 @@ function do_scroll() {
 	var scroll_to = parseInt($iframe.contents().scrollTop()) + amount;
 	if (scroll_to + parseInt($iframe.height()) > parseInt($iframe.contents().height())) scroll_to = parseInt($iframe.contents().height()) - parseInt($iframe.height());
 	if (window.navigator.userAgent.indexOf("Edge") > -1) {
-		var pos = scroll_to + parseInt($iframe.height());
-		var target = document.elementFromPoint(pos, 0);
-		$iframe.contents().find('#footer').scrollintoview({
-			duration:duration, 
-			direction:"y", 
-			complete:function() {
-				reset_timer(); 
-			}
+		var el = $iframe.contents().find('article').eq(0);  // The area we want to scroll
+		var scroller = el.closest(":scrollable(vertical)");  // The area that can actually scroll (probably the body tag)	
+		if (scroller.length <= 0) return false;
+		console.log('trying to scroll');
+		scroller = scroller.eq(0);
+		scroller.animate({
+			scrollTop: scroll_to
+		}, duration, function() {
+			reset_timer();
 		});
 	} else {
 		$iframe.contents().children().animate({ 
@@ -101,6 +102,8 @@ function do_click() {
 		// TODO
 		return;
 	}
+	var $link = $('#site').contents().find('article [href="'+url+'"]');
+	if ($link.length) $link.focus();
 	$('#site').attr('src', url);
 };
 function get_url() {
@@ -112,20 +115,35 @@ function get_url() {
 	return null;
 };
 function scalar_get_url() {
-	var selectors = [
-		'article header a.path_begin:first',  // "Begin path" on splash pages
-		'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
-		'article .relationships a.nav_btn:first',  // Move to a different path
-		// TODO: continue to button
-		'article .relationships a.path_begin:first'  // "Begin path" on pages
-	];
-	var $iframe = $('#site');
-	var selector = '';
-	for (var j = 0; j < selectors.length; j++) {
-		var $el = $iframe.contents().find(selectors[j]);
-		if ($el.length && 'undefined'!=typeof($el.attr('href'))) return $el.attr('href');
-	};
-	return null;
+		var selectors = [
+			'article header a.path_begin:first',  // "Begin path" on splash pages
+			'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
+			'article .relationships a.nav_btn:first',  // Move to a different path
+			// TODO: continue to button
+			'article .relationships a.path_begin:first'  // "Begin path" on pages
+		];
+		var $iframe = $('#site');
+		var selector = '';
+		for (var j = 0; j < selectors.length; j++) {
+			var $el = $iframe.contents().find(selectors[j]);
+			if ($el.length && 'undefined'!=typeof($el.attr('href'))) return $el.attr('href');
+		};
+		// Selectors didn't match, try to find an internal hyperlink
+		var slug = document.location.href.substr(document.location.href.indexOf('?book=')+6);
+		if (slug.indexOf('/') != -1) slug = slug.substr(0, slug.indexOf('/'));
+		var url = null;
+		$iframe.contents().find("*:not(iframe, object, embed, canvas, svg)").each(function() {
+			var $this = $(this);
+			if (!$this.is('a')) return;
+			if (!$this.closest('span[property="sioc:content"]').length) return;
+			if ('undefined' == typeof($this.attr('href')) || !$this.attr('href').length) return;
+			if ($this.attr('href').indexOf(slug) <= 0) return;
+			if ($this.attr('href').indexOf('media/') >= 0) return;
+			if (null==url) url = $this.attr('href');
+		});
+		if (null!=url) return url;
+		/// Couldn't find anything
+		return null;
 };
 function omeka_get_url() {
 	var selectors = [
@@ -153,6 +171,7 @@ function omeka_get_url() {
  * Licensed under the terms of the MIT license
  * http://www.opensource.org/licenses/mit-license.php
  */
+ // Needed for the :scrollable selector used in the Edge scroller ~Craig
 !function(t){var e={vertical:{x:!1,y:!0},horizontal:{x:!0,y:!1},both:{x:!0,y:!0},x:{x:!0,y:!1},y:{x:!1,y:!0}},o={duration:"fast",direction:"both"},r=/^(?:html)$/i,l=function(e){var o,l=t(window),i=r.test(e[0].nodeName);return{border:i?{top:0,left:0,bottom:0,right:0}:function(e,o){o=o||(document.defaultView&&document.defaultView.getComputedStyle?document.defaultView.getComputedStyle(e,null):e.currentStyle);var r=!(!document.defaultView||!document.defaultView.getComputedStyle),l={top:parseFloat(r?o.borderTopWidth:t.css(e,"borderTopWidth"))||0,left:parseFloat(r?o.borderLeftWidth:t.css(e,"borderLeftWidth"))||0,bottom:parseFloat(r?o.borderBottomWidth:t.css(e,"borderBottomWidth"))||0,right:parseFloat(r?o.borderRightWidth:t.css(e,"borderRightWidth"))||0};return{top:l.top,left:l.left,bottom:l.bottom,right:l.right,vertical:l.top+l.bottom,horizontal:l.left+l.right}}(e[0]),scroll:{top:(i?l:e).scrollTop(),left:(i?l:e).scrollLeft()},scrollbar:{right:i?0:e.innerWidth()-e[0].clientWidth,bottom:i?0:e.innerHeight()-e[0].clientHeight},rect:(o=e[0].getBoundingClientRect(),{top:i?0:o.top,left:i?0:o.left,bottom:i?e[0].clientHeight:o.bottom,right:i?e[0].clientWidth:o.right})}};t.fn.extend({scrollintoview:function(i){(i=t.extend({},o,i)).direction=e["string"==typeof i.direction&&i.direction.toLowerCase()]||e.both;var c="";!0===i.direction.x&&(c="horizontal"),!0===i.direction.y&&(c=c?"both":"vertical");var n=this.eq(0),d=n.closest(":scrollable("+c+")");if(d.length>0){d=d.eq(0);var s=l(n),h=l(d),a={top:s.rect.top-(h.rect.top+h.border.top),bottom:h.rect.bottom-h.border.bottom-h.scrollbar.bottom-s.rect.bottom,left:s.rect.left-(h.rect.left+h.border.left),right:h.rect.right-h.border.right-h.scrollbar.right-s.rect.right},u={};!0===i.direction.y&&(a.top<0?u.scrollTop=h.scroll.top+a.top:a.top>0&&a.bottom<0&&(u.scrollTop=h.scroll.top+Math.min(a.top,-a.bottom))),!0===i.direction.x&&(a.left<0?u.scrollLeft=h.scroll.left+a.left:a.left>0&&a.right<0&&(u.scrollLeft=h.scroll.left+Math.min(a.left,-a.right))),t.isEmptyObject(u)?t.isFunction(i.complete)&&i.complete.call(d[0]):(r.test(d[0].nodeName)&&(d=t("html,body")),d.animate(u,i.duration).eq(0).queue(function(e){t.isFunction(i.complete)&&i.complete.call(d[0]),e()}))}return this}});var i={auto:!0,scroll:!0,visible:!1,hidden:!1};t.extend(t.expr[":"],{scrollable:function(t,o,l,c){var n=e["string"==typeof l[3]&&l[3].toLowerCase()]||e.both,d=document.defaultView&&document.defaultView.getComputedStyle?document.defaultView.getComputedStyle(t,null):t.currentStyle,s={x:i[d.overflowX.toLowerCase()]||!1,y:i[d.overflowY.toLowerCase()]||!1,isRoot:r.test(t.nodeName)};if(!s.x&&!s.y&&!s.isRoot)return!1;var h={height:{scroll:t.scrollHeight,client:t.clientHeight},width:{scroll:t.scrollWidth,client:t.clientWidth},scrollableX:function(){return(s.x||s.isRoot)&&this.width.scroll>this.width.client},scrollableY:function(){return(s.y||s.isRoot)&&this.height.scroll>this.height.client}};return n.y&&h.scrollableY()||n.x&&h.scrollableX()}})}(jQuery);
 </script>
 </head>
