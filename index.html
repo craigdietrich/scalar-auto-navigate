@@ -80,10 +80,18 @@ function do_scroll() {
 	var scroll_to = parseInt($iframe.contents().scrollTop()) + amount;
 	if (scroll_to + parseInt($iframe.height()) > parseInt($iframe.contents().height())) scroll_to = parseInt($iframe.contents().height()) - parseInt($iframe.height());
 	if (window.navigator.userAgent.indexOf("Edge") > -1) {  // Things work a little differently in Edge within the Universal Windows Platform
-		var el = $iframe.contents().find('article').eq(0);  // The area we want to scroll
-		var scroller = el.closest(":scrollable(vertical)");  // The area that can actually scroll (probably the body tag)	
+		if ('scalar' == platform) {
+			var el = $iframe.contents().find('article').eq(0);
+		} else if ('omeka' == platform) {
+			var el = $iframe.contents().find('#wrap').eq(0);
+		} else if ('omeka-s' == platform) {
+	  		// TODO
+		};
+		if ('undefined'==typeof(el)) return false;
+		var scroller = el.closest(":scrollable(vertical)");  // The area that can actually scroll (probably the body tag)
 		if (scroller.length <= 0) return false;
 		scroller = scroller.eq(0);
+		if (scroller[0].nodeName.toLowerCase() == 'html') scroller = $iframe.contents().find('body').eq(0);
 		scroller.animate({
 			scrollTop: scroll_to
 		}, duration, function() {
