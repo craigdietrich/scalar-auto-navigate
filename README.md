@@ -9,6 +9,9 @@ Place **index.html** into a new folder at:
 Point to this URL in your browser:  
   
 **http://<span></span>path/to/scalar/system/application/plugins/auto-navigate/index.html?book=(book URL Segment)**  
+
+Example:  
+http://scalar.usc.edu/anvc/system/application/plugins/auto-navigate/index.html?book=black-quotidian
   
 ## Omeka
 Place **index.html** into a new folder at:  
