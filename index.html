@@ -20,9 +20,10 @@ $(document).ready(function() {
 		platform = 'scalar';
 	} else if (-1 != document.location.href.indexOf('plugins/AutoNavigate')) {
 		platform = 'omeka';
-	// TODO: Omeka S
+	} else if (-1 != document.location.href.indexOf('modules/AutoNavigate')) {
+		platform = 'omeka-s';
 	} else {
-		alert('Could not determine the platform (Scalar, Omeka)');
+		alert('Couldn\'t determine the platform (Scalar, Omeka, Omeka S)');
 		return;
 	}
 	console.log('Platform: '+platform);
@@ -45,6 +46,8 @@ $(document).ready(function() {
 		    	reset_timer();
 		    }); 
 		}); 
+	} else if ('omeka-s' == platform) {
+		// TODO
 	};
 	$iframe.attr('src', url);
 });
@@ -76,7 +79,7 @@ function do_scroll() {
 	};
 	var scroll_to = parseInt($iframe.contents().scrollTop()) + amount;
 	if (scroll_to + parseInt($iframe.height()) > parseInt($iframe.contents().height())) scroll_to = parseInt($iframe.contents().height()) - parseInt($iframe.height());
-	if (window.navigator.userAgent.indexOf("Edge") > -1) {
+	if (window.navigator.userAgent.indexOf("Edge") > -1) {  // Things work a little differently in Edge within the Universal Windows Platform
 		var el = $iframe.contents().find('article').eq(0);  // The area we want to scroll
 		var scroller = el.closest(":scrollable(vertical)");  // The area that can actually scroll (probably the body tag)	
 		if (scroller.length <= 0) return false;
@@ -97,7 +100,7 @@ function do_scroll() {
 };
 function do_click() {
 	var url = get_url();
-	console.log('clicking: '+url);
+	console.log('Clicking: '+url);
 	if (!url) {
 		// TODO
 		return;
@@ -111,11 +114,14 @@ function get_url() {
 		return scalar_get_url();
 	} else if ('omeka' == platform) {
 		return omeka_get_url();
+	} else if ('omeka-s' == platform) {
+  		return omeka_s_get_url();
 	};
 	return null;
 };
 function scalar_get_url() {
 		var selectors = [
+		    // TODO: close citations panel
 			'article header a.path_begin:first',  // "Begin path" on splash pages
 			'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
 			'article .relationships a.nav_btn:first',  // Move to a different path
@@ -159,6 +165,10 @@ function omeka_get_url() {
 		var $el = $iframe.contents().find(selectors[j]);
 		if ($el.length && 'undefined'!=typeof($el.attr('href'))) return $el.attr('href');
 	};
+	return null;
+};
+function omeka_s_get_url() {
+	// TODO
 	return null;
 };
 /*!
