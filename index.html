@@ -16,7 +16,7 @@ var platform = null;;
 $(document).ready(function() {
 	var $iframe = $('#site');
 	// Determine the platform
-	if (-1 != document.location.href.indexOf('?book=') && -1 != document.location.href.indexOf('system/application/plugins')) {
+	if (-1 != document.location.href.indexOf('book=') && -1 != document.location.href.indexOf('system/application/plugins')) {
 		platform = 'scalar';
 	} else if (-1 != document.location.href.indexOf('plugins/AutoNavigate')) {
 		platform = 'omeka';
@@ -30,7 +30,8 @@ $(document).ready(function() {
 	// Get the current book or site, load it, and start the timer
 	if ('scalar' == platform) {
 		var system = document.location.href.substr(0, document.location.href.indexOf('system/application/plugins'));
-		var slug = document.location.href.substr(document.location.href.indexOf('?book=')+6);
+		var slug = document.location.href.substr(document.location.href.indexOf('book=')+5);
+		if (-1 != slug.indexOf('&')) slug = slug.substr(0, slug.indexOf('&'));
 		var url = system + slug;
 		$iframe.on('load', function() {
 			reset_timer();
