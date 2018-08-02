@@ -12,7 +12,7 @@ body {color:#e3e3e3; font-size:1rem; font-family:-apple-system,BlinkMacSystemFon
 </style>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script>
-var platform = null;;
+var platform = null;
 $(document).ready(function() {
 	var $iframe = $('#site');
 	// Determine the platform
@@ -34,17 +34,17 @@ $(document).ready(function() {
 		if (-1 != slug.indexOf('&')) slug = slug.substr(0, slug.indexOf('&'));
 		var url = system + slug;
 		$iframe.on('load', function() {
-			reset_timer();
+			reset_timer(6);
 			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove scroll", function() {
-				reset_timer();
+				reset_timer(10);
 			});
 		});
 	} else if ('omeka' == platform) {
 		var url = document.location.href.substr(0, document.location.href.indexOf('plugins/AutoNavigate'));
 		$iframe.on('load', function() {
-			reset_timer();
+			reset_timer(6);
 		    $($iframe.contents()).bind("click mousemove scroll", function() {
-		    	reset_timer();
+		    	reset_timer(10);
 		    }); 
 		}); 
 	} else if ('omeka-s' == platform) {
@@ -53,7 +53,7 @@ $(document).ready(function() {
 	$iframe.attr('src', url);
 });
 function reset_timer(start) {
-	if ('undefined'==typeof(start)) start = 12;
+	if ('undefined'==typeof(start)) start = 6;
 	$('#countdown').text(start + ' sec');
 	if ('undefined'!=typeof(interval) && null!=interval) {
 		clearInterval(interval);
@@ -74,7 +74,7 @@ function do_scroll() {
 	$iframe = $("#site");
 	var buffer = parseInt($iframe.height()) * 0.5;
 	var amount = parseInt($iframe.height()) * 0.9;
-	var duration = 2500;
+	var duration = 4000;
 	if ( $iframe.contents().scrollTop() + $iframe.height() >= $iframe.contents().height() - buffer ) {
 		return false;
 	};
@@ -96,13 +96,13 @@ function do_scroll() {
 		scroller.animate({
 			scrollTop: scroll_to
 		}, duration, function() {
-			reset_timer();
+			reset_timer(4);
 		});
 	} else {
 		$iframe.contents().children().animate({ 
 			scrollTop: scroll_to + "px" 
 		}, duration, function() {
-			reset_timer();
+			reset_timer(4);
 		});
 	};
 	return true;
