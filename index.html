@@ -13,6 +13,7 @@ body {color:#e3e3e3; font-size:1rem; font-family:-apple-system,BlinkMacSystemFon
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script>
 var platform = null;
+var is_scrolling = false;
 $(document).ready(function() {
 	var $iframe = $('#site');
 	// Determine the platform
@@ -36,7 +37,7 @@ $(document).ready(function() {
 		$iframe.on('load', function() {
 			reset_timer(8);
 			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove scroll", function() {
-				reset_timer(10);
+				if (!is_scrolling) reset_timer(10);
 			});
 		});
 	} else if ('omeka' == platform) {
@@ -44,7 +45,7 @@ $(document).ready(function() {
 		$iframe.on('load', function() {
 			reset_timer(8);
 		    $($iframe.contents()).bind("click mousemove scroll", function() {
-		    	reset_timer(10);
+		    	if (!is_scrolling) reset_timer(10);
 		    }); 
 		}); 
 	} else if ('omeka-s' == platform) {
@@ -73,7 +74,7 @@ function reset_timer(start) {
 function do_scroll() {
 	$iframe = $("#site");
 	var buffer = parseInt($iframe.height()) * 0.5;
-	var amount = parseInt($iframe.height()) * 0.9;
+	var amount = parseInt($iframe.height()) * 0.8;
 	var duration = 4000;
 	if ( $iframe.contents().scrollTop() + $iframe.height() >= $iframe.contents().height() - buffer ) {
 		return false;
@@ -93,16 +94,26 @@ function do_scroll() {
 		if (scroller.length <= 0) return false;
 		scroller = scroller.eq(0);
 		if (scroller[0].nodeName.toLowerCase() == 'html') scroller = $iframe.contents().find('body').eq(0);
+		is_scrolling = true;
 		scroller.animate({
 			scrollTop: scroll_to
-		}, duration, function() {
-			reset_timer(4);
+		}, {
+			duration: duration,
+			always: function() {
+				reset_timer(4);
+				is_scrolling = false;
+			}
 		});
 	} else {
+		is_scrolling = true;
 		$iframe.contents().children().animate({ 
-			scrollTop: scroll_to + "px" 
-		}, duration, function() {
-			reset_timer(4);
+			scrollTop: scroll_to + "px"
+		}, {
+			duration: duration,
+			always: function() {
+				reset_timer(4);
+				is_scrolling = false;
+			}
 		});
 	};
 	return true;
@@ -134,6 +145,7 @@ function scalar_get_url() {
 			'article header a.path_begin:first',  // "Begin path" on splash pages
 			'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
 			'article .relationships a.nav_btn:first',  // Move to a different path
+			'article a.nav_btn:last',  // Visual Path layout
 			// TODO: continue to button
 			'article .relationships a.path_begin:first'  // "Begin path" on pages
 		];
