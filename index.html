@@ -34,7 +34,7 @@ $(document).ready(function() {
 		if (-1 != slug.indexOf('&')) slug = slug.substr(0, slug.indexOf('&'));
 		var url = system + slug;
 		$iframe.on('load', function() {
-			reset_timer(6);
+			reset_timer(8);
 			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove scroll", function() {
 				reset_timer(10);
 			});
@@ -42,7 +42,7 @@ $(document).ready(function() {
 	} else if ('omeka' == platform) {
 		var url = document.location.href.substr(0, document.location.href.indexOf('plugins/AutoNavigate'));
 		$iframe.on('load', function() {
-			reset_timer(6);
+			reset_timer(8);
 		    $($iframe.contents()).bind("click mousemove scroll", function() {
 		    	reset_timer(10);
 		    }); 
