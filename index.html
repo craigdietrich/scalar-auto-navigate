@@ -14,6 +14,8 @@ body {color:#e3e3e3; font-size:1rem; font-family:-apple-system,BlinkMacSystemFon
 <script>
 var platform = null;
 var is_scrolling = false;
+var prev_urls = [];
+var max_clicks = 20;
 $(document).ready(function() {
 	var $iframe = $('#site');
 	// Determine the platform
@@ -120,9 +122,18 @@ function do_scroll() {
 };
 function do_click() {
 	var url = get_url();
+	if (prev_urls.indexOf(url) != -1) {
+		window.parent.postMessage('autonavigate_finished','*');
+		return;
+	}
+	prev_urls.push(url);
+	if (prev_urls.length > max_clicks) {
+		window.parent.postMessage('autonavigate_finished','*');
+		return;		
+	}
 	console.log('Clicking: '+url);
 	if (!url) {
-		// TODO
+		window.parent.postMessage('autonavigate_finished','*');
 		return;
 	}
 	var $link = $('#site').contents().find('article [href="'+url+'"]');
