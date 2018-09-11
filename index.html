@@ -7,7 +7,11 @@
 <meta name="description" content="Auto-navigate Scalar projects. Also works with Omeka. See documentation at https://github.com/craigdietrich/scalar-auto-navigate.">
 <style>
 body {color:#e3e3e3; font-size:1rem; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !important;}
-#site {position:absolute; left:0px; top:0px; width:100%; height:100%; z-index:8; border:0; background-color:#000000;}
+#site {position:absolute; left:0px; top:0px; width:100%; height:100%; z-index:7; border:0; background-color:#000000;}
+.custom_msg {
+    position:fixed; left:10%; right:10%; top:15px; z-index:8; background-color:#000000; color:#bbbbbb; border-radius:10px;
+    text-align:center; padding:6px 10px 7px 10px; overflow:hidden; font-size:smaller; display:none;
+}
 #countdown {position:absolute; background-color:#333333; right:0px; top:0px; padding:5px 10px 3px 10px; font-size:smaller; z-index:9; opacity:0.5;}
 </style>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -54,6 +58,9 @@ $(document).ready(function() {
 			});
 			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove", function() {
 				window.parent.postMessage('autonavigate_user_interaction','*');
+				$('.custom_msg').fadeOut('slow', function() {
+					remove();
+				});
 			});
 			$iframe[0].contentWindow.postMessage('css_no_zooming', '*');
 		});
@@ -71,7 +78,7 @@ $(document).ready(function() {
 	$iframe.attr('src', url);
 });
 function reset_timer(start) {
-	if ('undefined'==typeof(start)) start = 15;
+	if ('undefined'==typeof(start)) start = 20;
 	$('#countdown').text(start + ' sec');
 	stop_timer();
 	interval = setInterval(function() {
@@ -93,9 +100,9 @@ function stop_timer() {
 }
 function do_scroll() {
 	$iframe = $("#site");
-	var buffer = parseInt($iframe.height()) * 0.5;
+	var buffer = parseInt($iframe.height()) * 0.4;
 	var amount = parseInt($iframe.height()) * 0.8;
-	var duration = 5000;
+	var duration = 4000;
 	if ( $iframe.contents().scrollTop() + $iframe.height() >= $iframe.contents().height() - buffer ) {
 		return false;
 	};
@@ -121,9 +128,12 @@ function do_scroll() {
 			duration: duration,
 			always: function() {
 				is_scrolling = false;
-				reset_timer(3);
+				reset_timer(5);
 			}
 		});
+        var $custom = $('<div class="custom_msg"></div>').insertAfter($iframe);
+        $custom.html('<b>'+$iframe.contents().find('a.book-title').html()+'</b>');
+        $custom.delay(duration + 200).fadeIn('slow');
 	} else {
 		is_scrolling = true;
 		$iframe.contents().children().animate({ 
@@ -132,9 +142,12 @@ function do_scroll() {
 			duration: duration,
 			always: function() {
 				is_scrolling = false;
-				reset_timer(3);
+				reset_timer(5);
 			}
 		});
+        var $custom = $('<div class="custom_msg"></div>').insertAfter($iframe);
+        $custom.html('<b>'+$iframe.contents().find('a.book-title').html()+'</b>');
+        $custom.delay(duration + 200).fadeIn('slow');
 	};
 	return true;
 };
@@ -157,6 +170,9 @@ function do_click() {
 	var $link = $('#site').contents().find('article [href="'+url+'"]');
 	if ($link.length) $link.focus();
 	$('#site').attr('src', url);
+	$('.custom_msg').fadeOut('slow', function() {
+		remove();
+	});
 	window.parent.postMessage('autonavigate_click','*');
 };
 function get_url() {
