@@ -59,7 +59,7 @@ $(document).ready(function() {
 			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove", function() {
 				window.parent.postMessage('autonavigate_user_interaction','*');
 				$('.custom_msg').fadeOut('slow', function() {
-					remove();
+					$(this).remove();
 				});
 			});
 			$iframe[0].contentWindow.postMessage('css_no_zooming', '*');
@@ -171,7 +171,7 @@ function do_click() {
 	if ($link.length) $link.focus();
 	$('#site').attr('src', url);
 	$('.custom_msg').fadeOut('slow', function() {
-		remove();
+		$(this).remove();
 	});
 	window.parent.postMessage('autonavigate_click','*');
 };
