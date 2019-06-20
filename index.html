@@ -20,6 +20,7 @@ var platform = null;
 var is_scrolling = false;
 var prev_urls = [];
 var max_clicks = 20;
+var global_stop_timer = false;
 $(document).ready(function() {
 	var $iframe = $('#site');
 	// Determine the platform
@@ -43,6 +44,16 @@ $(document).ready(function() {
             case 'autonavigate_stop_timer':
                 stop_timer();
                 break;
+            case 'autonavigate_kill_timer':
+            	global_stop_timer = true;
+            	stop_timer();
+            	$('#countdown').fadeOut();
+            	break;
+            case 'autonavigate_birth_timer':
+            	global_stop_timer = false;
+            	reset_timer();
+            	$('#countdown').fadeIn();
+            	break;            	
         }
     }, false);
 	// Get the current book or site, load it, and start the timer
@@ -78,6 +89,7 @@ $(document).ready(function() {
 	$iframe.attr('src', url);
 });
 function reset_timer(start) {
+	if (global_stop_timer) return;
 	if ('undefined'==typeof(start)) start = 20;
 	$('#countdown').text(start + ' sec');
 	stop_timer();
