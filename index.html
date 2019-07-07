@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <title>Scalar Auto-navigate Plugin</title>
-<meta name="author" content="http://craigdietrich.com">
-<meta name="description" content="Auto-navigate Scalar projects. Also works with Omeka. See documentation at https://github.com/craigdietrich/scalar-auto-navigate.">
+<meta name="author" content="craigdietrich.com">
+<meta name="description" content="Auto-navigate Scalar projects. Also works with Omeka and Omeka S. See documentation at https://github.com/craigdietrich/scalar-auto-navigate.">
 <style>
 body {color:#e3e3e3; font-size:1rem; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !important;}
 #site {position:absolute; left:0px; top:0px; width:100%; height:100%; z-index:7; border:0; background-color:#000000;}
@@ -81,10 +81,28 @@ $(document).ready(function() {
 			reset_timer();
 		    $($iframe.contents()).bind("click mousemove scroll", function() {
 		    	if (!is_scrolling) reset_timer();
-		    }); 
+		    });
+			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove", function() {
+				window.parent.postMessage('autonavigate_user_interaction','*');
+				$('.custom_msg').fadeOut('slow', function() {
+					$(this).remove();
+				});
+			});		    
 		}); 
 	} else if ('omeka-s' == platform) {
-		// TODO
+		var url = decodeURIComponent(document.location.href.substr(document.location.href.indexOf('site=')+5));
+		$iframe.on('load', function() {
+			reset_timer();
+		    $($iframe.contents()).bind("click mousemove scroll", function() {
+		    	if (!is_scrolling) reset_timer();
+		    });
+			$iframe[0].contentWindow.$($iframe[0].contentWindow.document).bind("click mousemove", function() {
+				window.parent.postMessage('autonavigate_user_interaction','*');
+				$('.custom_msg').fadeOut('slow', function() {
+					$(this).remove();
+				});
+			});    
+		});
 	};
 	$iframe.attr('src', url);
 });
@@ -126,7 +144,7 @@ function do_scroll() {
 		} else if ('omeka' == platform) {
 			var el = $iframe.contents().find('#wrap').eq(0);
 		} else if ('omeka-s' == platform) {
-	  		// TODO
+			var el = $iframe.contents().find('#content').eq(0);
 		};
 		if ('undefined'==typeof(el)) return false;
 		var scroller = el.closest(":scrollable(vertical)");  // The area that can actually scroll (probably the body tag)
@@ -144,7 +162,7 @@ function do_scroll() {
 			}
 		});
         var $custom = $('<div class="custom_msg"></div>').insertAfter($iframe);
-        $custom.html('<b>'+$iframe.contents().find('a.book-title').html()+'</b>');
+        $custom.html('<b>'+$iframe.contents().find('a.book-title, header h1 > span').html()+'</b>');
         $custom.delay(duration + 200).fadeIn('slow');
 	} else {
 		is_scrolling = true;
@@ -158,7 +176,7 @@ function do_scroll() {
 			}
 		});
         var $custom = $('<div class="custom_msg"></div>').insertAfter($iframe);
-        $custom.html('<b>'+$iframe.contents().find('a.book-title').html()+'</b>');
+        $custom.html('<b>'+$iframe.contents().find('a.book-title, header h1 > span').html()+'</b>');
         $custom.delay(duration + 200).fadeIn('slow');
 	};
 	return true;
@@ -247,7 +265,14 @@ function omeka_get_url() {
 	return null;
 };
 function omeka_s_get_url() {
-	// TODO
+	var $iframe = $('#site');
+	var $active = $iframe.contents().find('header .navigation > li.active');
+	if ($active.next().length) {
+		var $el = $active.next();	
+	} else {
+		var $el = $iframe.contents().find('header .navigation > li:first');
+	};
+	if ($el.length) return $el.children('a').eq(0).attr('href');
 	return null;
 };
 /*!
