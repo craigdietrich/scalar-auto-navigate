@@ -1,6 +1,4 @@
 # Scalar, Omeka, Omeka-S, and Google Slides Auto-navigate
-Have the browser auto-navigate through Scalar books. Also works with Omeka.  
-
 If you're using this file in conjuction with CommonPlace, follow the instructions below. When encountering a project URL, CommonPlace will look for the plugin in each platform's respective folder.
 
 ## Scalar  
