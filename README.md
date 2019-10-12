@@ -1,4 +1,4 @@
-# Scalar & Omeka & Omeka-S & Google Slides Auto-navigate
+# Scalar, Omeka, Omeka-S, and Google Slides Auto-navigate
 Have the browser auto-navigate through Scalar books. Also works with Omeka.
 
 ## Scalar  
