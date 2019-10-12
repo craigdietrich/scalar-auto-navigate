@@ -1,4 +1,4 @@
-# Scalar, Omeka, Omeka-S, and Google Slides Auto-navigate
+# Scalar, Omeka, and Omeka-S Auto-navigate
 If you're using this file in conjuction with CommonPlace, follow the instructions below. When encountering a project URL, CommonPlace will look for the plugin in each platform's respective folder.
 
 ## Scalar  
@@ -33,6 +33,3 @@ Place **index.html** into a new folder at:
 Point to this URL in your browser:  
   
 **http://<span></span>path/to/omeka/modules/AutoNavigate/index.html**  
-
-## Google Slides
-This is a bit more complicated... will post instructions soon.
