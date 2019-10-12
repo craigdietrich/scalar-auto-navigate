@@ -11,7 +11,7 @@ Point to this URL in your browser:
 **http://<span></span>path/to/scalar/system/application/plugins/auto-navigate/index.html?book=(book URL Segment)**  
 
 Example:  
-http://scalar.usc.edu/anvc/system/application/plugins/auto-navigate/index.html?book=black-quotidian
+http://scalar.usc.edu/works/system/application/plugins/auto-navigate/index.html?book=guide2
   
 ## Omeka
 Place **index.html** into a new folder at:  
