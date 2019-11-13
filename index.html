@@ -198,7 +198,7 @@ function do_click() {
 		return;
 	}
 	var $link = $('#site').contents().find('article [href="'+url+'"]');
-	if ($link.length) $link.focus();
+	if ($link.length && !$link.closest('.visual_path').length) $link.focus();
 	$('#site').attr('src', url);
 	$('.custom_msg').fadeOut('slow', function() {
 		$(this).remove();
@@ -219,17 +219,20 @@ function scalar_get_url() {
 		var selectors = [
 		    // TODO: close citations panel
 			'article header a.path_begin:first',  // "Begin path" on splash pages
+			'article.visual_path .nav_btn:first',  // Visual Path
+			'article .relationships a.path_begin:first',  // "Begin path" on pages
 			'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
-			'article .relationships a.nav_btn:first',  // Move to a different path
-			'article a.nav_btn:last',  // Visual Path layout
-			// TODO: continue to button
-			'article .relationships a.path_begin:first'  // "Begin path" on pages
+			'article .relationships a.nav_btn:not(.bordered):first',  // Move to a different path
+			'article a.nav_btn:last'  // Visual Path layout
 		];
 		var $iframe = $('#site');
 		var selector = '';
 		for (var j = 0; j < selectors.length; j++) {
 			var $el = $iframe.contents().find(selectors[j]);
-			if ($el.length && 'undefined'!=typeof($el.attr('href'))) return $el.attr('href');
+			if ($el.length && 'undefined'!=typeof($el.attr('href'))) {
+				console.log("Selector: " + selectors[j]);
+				return $el.attr('href');
+			}
 		};
 		// Selectors didn't match, try to find an internal hyperlink
 		var slug = document.location.href.substr(document.location.href.indexOf('?book=')+6);
