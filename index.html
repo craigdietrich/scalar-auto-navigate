@@ -198,7 +198,7 @@ function do_click() {
 		return;
 	}
 	var $link = $('#site').contents().find('article [href="'+url+'"]');
-	if ($link.length && !$link.closest('.visual_path').length) $link.focus();
+	if ($link.length && !$link.closest('.visual_path').length && !$link.closest('#gallery_content').length) $link.focus();
 	$('#site').attr('src', url);
 	$('.custom_msg').fadeOut('slow', function() {
 		$(this).remove();
@@ -220,6 +220,7 @@ function scalar_get_url() {
 		    // TODO: close citations panel
 			'article header a.path_begin:first',  // "Begin path" on splash pages
 			'article.visual_path .nav_btn:first',  // Visual Path
+			'#gallery_content .content_block:first a:first',  // Structured Media Gallery
 			'article .relationships a.path_begin:first',  // "Begin path" on pages
 			'article .relationships a.continue_btn:first',  // "Continue path" e.g. pages on paths
 			'article .relationships a.nav_btn:not(.bordered):first',  // Move to a different path
