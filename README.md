@@ -32,4 +32,9 @@ Place **index.html** into a new folder at:
   
 Point to this URL in your browser:  
   
-**http://<span></span>path/to/omeka/modules/AutoNavigate/index.html**  
+**http://<span></span>path/to/omeka/modules/AutoNavigate/index.html** (all sites)  
+or  
+**http://<span></span>path/to/omeka/modules/AutoNavigate/index.html?site=(site URL Segment)** (a single site)  
+ 
+Example:  
+http://specialcollections.oxycreates.org/equitydiversity/modules/AutoNavigate/index.html?site=/equitydiversity/s/oxy-united-for-black-liberation
